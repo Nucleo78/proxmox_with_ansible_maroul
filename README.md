@@ -10,7 +10,7 @@ Ensuite le dossier inventories va contenir les différents fichiers d'environnem
 - prd (pour production)
 - dev (pour le développement local)
 
-![image](assets/structure_projet.jpg)
+![image](assets/3.structure_projet.jpg)
 
 ## Instructions pour utilisation
 ### Prérequis
@@ -39,5 +39,5 @@ On vous demandera ensuite le mot de passe que vous avez configuré pour le compt
 Normalement, la machine virtuelle devrait se créer avec un id de libre, puis se lancer.
 
 ### Exemple d'exécution
-![image](assets/execution.jpg)
-![image](assets/execution2.jpg)
+![image](assets/1.execution.jpg)
+![image](assets/2.execution.jpg)
