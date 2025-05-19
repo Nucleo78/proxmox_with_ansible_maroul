@@ -1,51 +1,51 @@
 - name: Création d'une VM via l'API Proxmox
-  hosts: localhost
+  hosts: proxmox
+  connection: local
+  gather_facts: false
+  vars_files:
+    - inventories/prd/group_vars/secrets.yml
   vars:
-    api_host: "https://192.168.30.140:8006"
-    api_user: "root@pam!ansible-token"
-    api_token: "7549b8bf-4e23-417e-a722-e86528be08cc"
-    node: "node0"
+    vm_name_prefix: "vm-lubuntu"
 
   tasks:
     - name: Récupérer la liste des VMs existantes
       uri:
-        url: "{{ api_host }}/api2/json/cluster/resources?type=vm"
+        url: "{{ proxmox_api_host }}/api2/json/cluster/resources?type=vm"
         method: GET
         headers:
-          Authorization: "PVEAPIToken={{ api_user }}={{ api_token }}"
+          Authorization: "PVEAPIToken={{ proxmox_api_user }}={{ proxmox_api_token }}"
         validate_certs: false
       register: vm_list
 
     - name: Calculer le prochain VMID disponible
       set_fact:
         vmid: "{{ (vm_list.json.data | map(attribute='vmid') | list | max | default(100)) + 1 }}"
-        vm_name: "vm-lubuntu-{{ (vm_list.json.data | map(attribute='vmid') | list | max | default(100)) + 1 }}"
+        vm_name: "{{ vm_name_prefix }}-{{ (vm_list.json.data | map(attribute='vmid') | list | max | default(100)) + 1 }}"
 
     - name: Créer une VM Proxmox via API
       uri:
-        url: "{{ api_host }}/api2/json/nodes/{{ node }}/qemu"
+        url: "{{ proxmox_api_host }}/api2/json/nodes/{{ node }}/qemu"
         method: POST
         headers:
-          Authorization: "PVEAPIToken={{ api_user }}={{ api_token }}"
+          Authorization: "PVEAPIToken={{ proxmox_api_user }}={{ proxmox_api_token }}"
           Content-Type: "application/x-www-form-urlencoded"
         body_format: form-urlencoded
         body:
           vmid: "{{ vmid }}"
           name: "{{ vm_name }}"
-          cores: 2
-          memory: 1024
-          scsi0: local-lvm:10
-          net0: virtio,bridge=vmbr0
+          cores: "{{ vm_cores }}"
+          memory: "{{ vm_memory }}"
+          scsi0: "{{ vm_storage }}:{{ vm_disk_size }}"
+          net0: "virtio,bridge=vmbr0"
           ostype: l26
-          ide2: local:iso/lubuntu-16.04.6-desktop-amd64.iso,media=cdrom
+          ide2: "{{ iso_storage }}:iso/{{ iso_file }},media=cdrom"
           boot: cdn
         validate_certs: false
 
     - name: Démarrer la VM
       uri:
-        url: "{{ api_host }}/api2/json/nodes/{{ node }}/qemu/{{ vmid }}/status/start"
+        url: "{{ proxmox_api_host }}/api2/json/nodes/{{ node }}/qemu/{{ vmid }}/status/start"
         method: POST
         headers:
-          Authorization: "PVEAPIToken={{ api_user }}={{ api_token }}"
+          Authorization: "PVEAPIToken={{ proxmox_api_user }}={{ proxmox_api_token }}"
         validate_certs: false
-
