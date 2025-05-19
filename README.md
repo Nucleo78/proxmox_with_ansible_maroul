@@ -21,7 +21,8 @@ Ensuite le dossier inventories va contenir les différents fichiers d'environnem
 - ansible installé
 - serveur Proxmox configuré et lancé. Il doit être accessible depuis votre machine qui exécute le code ansible
 - le serveur est configuré avec l'ip : 192.168.30.140
-- Vous pouvez changer l'ip de configuration dans les fichiers .yml des dossiers /prd et /dev (host.yml)
+- Vous pouvez changer l'ip de configuration dans les fichiers all.yml des dossiers /prd et /dev
+- Vous pouvez changer les identifiants de connexion avec votre jeton api dans les fichiers secrets.yml
 
 #### Installation de python et d'ansible
 Personnellement, j'ai créer un environnement isolé pour ansible. Voici les commandes à utiliser pour créer l'environnement et installer ansible :
